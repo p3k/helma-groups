@@ -1,0 +1,15 @@
+<table width="600" border="0" cellspacing="2" cellpadding="1">
+
+<tr>
+   <td width="600" colspan="2" height="10"></td>
+</tr>
+<tr>
+   <td width="100">testactions</td>
+   <td width="500">
+      <a href=addobjects>add 10 objects</a> | 
+      <a href=removeobjects>remove 10 objects</a> | 
+      <a href=execute>call function</a> | 
+      <a href=test>test</a>
+   </td>
+</tr>
+</table>

@@ -1,0 +1,17 @@
+
+<config groupname="testchen">
+    <UDP mcast_recv_buf_size="64000" mcast_send_buf_size="32000" port_range="100" mcast_port="45566" use_incoming_packet_handler="false" ucast_recv_buf_size="64000" mcast_addr="228.8.8.8" bind_port="46000" loopback="true" ucast_send_buf_size="32000" ip_ttl="32" />
+    <AUTOCONF />
+    <PING timeout="2000" num_initial_members="3"/>
+    <MERGE2 max_interval="10000" min_interval="5000"/>
+    <FD timeout="2000" max_tries="3" shun="true"/>
+    <VERIFY_SUSPECT timeout="1500"/>
+    <pbcast.NAKACK max_xmit_size="8192" gc_lag="50" retransmit_timeout="600,1200,2400,4800"/>
+    <UNICAST timeout="1200,2400,3600"/>
+    <pbcast.STABLE stability_delay="1000" desired_avg_gossip="20000" max_bytes="0"/>
+    <FRAG frag_size="8192" down_thread="false" up_thread="false"/>
+    <pbcast.GMS print_local_addr="true" join_timeout="3000" join_retry_timeout="2000" shun="false"/>
+    <COMPRESS min_size="500" compression_level="9"/>
+    <pbcast.STATE_TRANSFER />
+</config>
+

@@ -1,0 +1,24 @@
+<html>
+<head>
+   <title>group status</title>
+   <style type="text/css">
+      td {
+         font-family:arial;
+         font-size:12px;
+      }
+   </style>
+</head>
+
+<body>
+
+<table width="600" border="0" cellpadding="0" cellspacing="0">
+<tr>
+   <td width="600"><b><font face=arial><font size=+3>
+   <a href="<% this.href action="main" %>">group status</a></font></b></td>
+</tr>
+<tr>
+   <td height="30"><% response.message %></td>
+</tr>
+</table>
+
+

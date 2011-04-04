@@ -1,0 +1,56 @@
+<table width="600" border="0" cellspacing="2" cellpadding="1">
+
+<tr>
+   <td width="600" colspan="2" height="10"></td>
+</tr>
+
+<tr>
+   <td width="600" colspan="2" height="1" bgcolor="#000000"></td>
+</tr>
+
+<tr>
+   <td width="100" valign="top"><b><% param.name %></b></td>
+   <td width="500">local connection: <% param.connection %></td>
+</tr>
+
+<tr>
+   <td width="100"></td>
+   <td width="500" colspan="2">
+      <a href="<% this.href action="connect" %>?name=<% param.name %>">connect</a> 
+      <a href="<% this.href action="disconnect" %>?name=<% param.name %>">disconnect</a> 
+      <a href="<% this.href action="reconnect" %>?name=<% param.name %>">reconnect</a> 
+      <a href="<% this.href action="reset" %>?name=<% param.name %>">reset</a> 
+      <a href="<% this.href action="destroy" %>?name=<% param.name %>">destroy</a> 
+
+   </td>
+</tr>
+
+
+<tr>
+   <td width="100" valign="top">content</td>
+   <td width="500" colspan="2"><% param.content %><br/>
+      (<a href="<% this.href action="main" %>?content=true&name=<% param.name %>">details</a>)
+      (<a href="<% this.href action="main" %>?fullcontent=true&name=<% param.name %>">all details</a>)
+</td>
+</tr>
+
+<tr>
+   <td width="100" valign="top">member server</td>
+   <td width="500" colspan="2"><% param.members %></td>
+</tr>
+
+<tr>
+   <td width="100" valign="top">member apps</td>
+   <td width="500" colspan="2"><% param.memberApps %></td>
+</tr>
+
+<tr>
+   <td width="100" valign="top">config</td>
+   <td width="500" colspan="2"><% param.config %>
+      (<a href="<% this.href action="main" %>?config=true&name=<% param.name %>">show full config</a>)
+   </td>
+</tr>
+
+</table>
+
+

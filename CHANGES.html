@@ -1,0 +1,91 @@
+<pre>ChangeLog:
+
+
+Version 0.10, April 6, 2005
+
+- changed internals of GroupObject, not compatible to older versions because of serialVersionUID
+
+- lots of code cleanup
+
+
+
+Version 0.9, March 2005
+
+- removed support for Rhino from java core, javascript extension needed
+
+- added TelnetDebugger
+
+
+Version 0.7, May 14, 2004
+
+- sendmode for each mounting, default is to wait for all
+
+- fixed bug that made the group use the wrong name
+
+- group logs elapsed milliseconds for network actions
+
+
+
+
+Version 0.6, Mar 29, 2004
+
+- removed compatibility with FESI and helma 1.2.
+
+- configuration for jg-stack can be fetched from an URL
+
+- name of a group is the name of the stack config (first line of
+  the xml-config file)
+
+
+Version 0.5.1, Jan 5, 2004
+
+- logging in helma 1.3 changed slightly, therefore minor tweak
+  necessary if compiled with helma 1.2
+
+
+
+Version 0.5, Nov 11, 2003
+
+- Updated packages from Javagroups to JGroups
+
+- added COMPRESS protocol which made own async state transfer obsolete,
+  removed most of those functions
+
+
+
+Version 0.4, Sept 29, 2003
+
+- GroupExtension now runs Rhino too, so finally we're Helma1.3 compatible
+
+- compilation now needs both an 1.2 and a 1.3 installation
+
+- created scripts helmagroups/test.sh and test.bat that can create a group
+  without starting helma and provide information on multicast settings in
+  the network
+
+- fixed bug concerning creation of the root object in a group
+
+
+
+Version 0.3.1, Mar 07, 2003
+
+
+- Fixed bug http://helma.org/bugs/show_bug.cgi?id=223 related to 
+  offline manipulation of GroupObjects
+
+- Fixed bug http://helma.org/bugs/show_bug.cgi?id=224
+
+- Added group.log(msg) to log in the same logfile as the group extension does.
+
+- In app.properties group.writeable and group.writable can be used
+
+- Added group.getFullConfig()
+
+- Included groupmgr.zip which contains a mountpoint that can be added to any
+  application using the groupextension. It provides a simple to all available
+  data of a group.
+
+
+
+
+</pre>

@@ -1,0 +1,227 @@
+<html>
+<head>
+   <style type="text/css">
+      p {
+         font-family: arial;
+      }
+      h2 { 
+         font-family: arial;
+         font-weight: bold;
+         font-size: 130%;
+         text-decoration:underline;
+      }
+      h4 { 
+         font-family: arial;
+         font-weight: bold;
+         font-size: 115%;
+      }
+   </style>
+</head>
+<body>
+<pre>
+
+    HelmaGroups - an extension for Helma Object Publisher
+    =====================================================
+
+</pre>
+<p>This package enables group-communication between different Helma Servers over the network taking advantage of JGroups Library (<a href="http://www.jgroups.org">www.jgroups.org</a>). A new global object <code>group</code> is added to the scripting environment and all changes in that object tree are immediately replicated to all members.</p>
+
+<h2>Helma prerequistes</h2>
+
+<p>Helma 1.3 is needed.
+
+<h2>Installation</h2>
+
+<p>Unzip the distribution to your Helma home directory. A new subdirectory <code>helmagroups</code> will be created and <code>helmagroups-0.7.jar</code> and <code>jgroups-all.jar</code> are extracted to <code>lib/ext</code>.</p>
+
+<h2>Configuration</h2>
+
+<h4>server.properties</h4>
+
+<p>To activate HelmaGroups for a server add this line to the server.properties file. This makes Helma load the extension at startup and add a global object <code>group</code> to every application.</p>
+
+<pre>extensions = helma.extensions.helmagroups.GroupExtension</pre>
+
+<h4>JGroups stack</h4>
+
+<p>To create a group we first need a configuration of the network properties: This is located in an xml-file in the /helmagroups-directory. A JGroups stack consists of a number of protocols that handle group traffic. At the bottom is a protocol that does the actual transmission (UDP or TCP), above that come protocols that handle group membership (PING, TCPPING, MERGE2, GMS - group membership service etc) and some protocols that take care of messages (FRAG - divides up larger message into smaller pieces, NAKACK - reliable mcast message transission etc). Two default stacks are included with the extension, default.xml for multicast-setups (basically only useful in a LAN environment) and tcp.xml for tcp-setups that can run over a WAN too.</p>
+
+<h4>Multicast</h4>
+
+<p>The following parameters in the stack config have to be set in case of using the UDP protocol (default.xml):
+<pre>
+&lt;protocol-param name="mcast_addr" value="228.8.8.8"/&gt;
+&lt;protocol-param name="mcast_port" value="45566"/&gt;
+&lt;protocol-param name="bind_port"  value="46000"/&gt;
+&lt;protocol-param name="port_range" value="1000"/&gt;
+&lt;protocol-param name="ip_ttl"     value="32"/&gt;
+&lt;protocol-param name="bind_addr"  value="192.168.10.10"/&gt;
+</pre>
+</p>
+<p><code>mcast_addr</code> and <code>mcast_port</code> specify the multicast address this group is using. If you wan to run different groups each needs its own xml-configuration-file with either a different address or port here. <code>ip_ttl</code> specifies how far multicast packets travel on the network: If set to 0 they are only seen on the localhost, 32 is for the whole network, higher values may be needed if your router is forwarding multicast traffic to another network. <code>bind_addr</code> is only needed when your computer has more than one network adapter. <code>bind_port</code> and <code>port_range</code> define a number of ports used for group membership management (the full range needs to be open in the firewall too).</p>
+
+<h4>TCP</h4>
+<p>Configuration in case of a TCP stack (tcp.xml):
+<pre>
+TCP:
+&lt;protocol-param name="start_port" value="7800"/&gt;
+&lt;protocol-param name="bind_addr"  value="192.168.10.10"/&gt;
+
+TCPPING:
+&lt;protocol-param name="initial_hosts" value="www.helma.org[7800],classic.helma.at[7800]"/&gt;
+&lt;protocol-param name="port_range" value="3"/&gt;
+</pre>
+</p>
+
+<p>In the TCP protocol <code>start_port</code> defines which port a new member tries to use first. If it is already taken (possibly be another group instance running on the same machine the port number is increased until a free port is found. <code>bind_addr</code> is again only necessary for multiple network adapters.</p>
+<p>The TCPPING protocol is responsible for finding other group members. Hosts that can be contacted at startup are listed in <code>inital_hosts</code>, <code>port_range</code> defines how many port above the given are tried.
+</p>
+
+
+<h4>Mounting a group</h4>
+<p>An application can run different groups: The network- and stack-configuration for each group is located in an xml-file. This configuration can either be stored locally in the the helmahome/helmagroups-directory or is fetched from an url. To mount such a group to an application add this to the <code>app.properties</code> file:</p>
+
+<pre>
+group.&lt;alias&gt;          = &lt;filename-of-config&gt;
+group.&lt;alias&gt;.writable = true | false
+group.&lt;alias&gt;.sendMode = all | majority | first | none
+</pre>
+or
+<pre>
+group.&lt;alias&gt;          = http://&lt;your-config-url&gt;
+group.&lt;alias&gt;.writable = true | false
+group.&lt;alias&gt;.sendMode = all | majority | first | none
+</pre>
+
+<p>Each group is available as <code>group.&lt;alias&gt;</code> to the scripting environment. To be able to change a group from an application the <code>writable</code> property explicitly has to be set to <code>true</code>. The <code>sendMode</code> property defines how the group is going to handle write operations: in mode <code>all</code> it waits for all other group members to acknowledge a change operation, <code>majority</code> waits for 50% + 1 member, <code>first</code> is obvious. <code>none</code> sets the group to fire & forget mode - be careful with your group architecture as this can cause confusion if the group is fed from more than one member.
+</p>
+
+
+<h4>Debugging  </h4>
+
+<p>In the <code>/helmagroups/debug.properties</code> different levels of debugging can be defined:</p>
+<pre>debug.helma = true</pre>
+<p>This makes the HelmaExtension log all its activities (each put/remove-operation is logged when sent and when received).</p>
+<pre>trace=true</pre>
+<p>This makes JGroups log all in- and outgoing messages/events.</p>
+<pre>trace=true
+default_output=DEBUG STDOUT</pre>
+<p>This makes JGroups log all activities - use this only for debugging as it creates megabytes of log data within minutes.</p>
+
+<h2>Usage in the scripting environment</h2>
+
+<p>Basically, a new global object <code>group</code> is added to the scripting environment (like <code>app</code> or <code>root</code> etc). Below this object a tree of objects can be built, with all add-, modify- and remove-operations being transmitted to the network and replicated to all other helma servers in that group immediately. The JGroups-library takes care of transmitting these operations lossless, ordered and obtains the correct state during startup.</p>
+
+<p>The group object is visible in all applications in the group. To this object new GroupObjects can be added. A GroupObject can have strings, numbers, dateobjects and other GroupObjects as properties, so a tree of GroupObjects and data can be built.</p>
+
+<pre>
+group.test = new GroupObject();
+group.test.somekey = "some value";
+group.test.propkey1 = new GroupObject();
+group.test.propkey1.anotherkey = "another value";
+</pre>
+
+<p>As soon as a GroupObject is assigning to the tree, it can be seen by all other members of the group. From that point on, any change of a property will be replicated immediately to all other members. Please note that a change operation will block until it has been seen by all group members. So the above code would produce three updates of the group, better would be the following code:</p>
+
+<pre>
+var obj = new GroupObject();
+obj.somekey1 = "somevalue1";
+obj.somekey2 = "somevalue2";
+group.test = obj; < now the whole object gets replicated
+</pre>
+
+<p>Unfortunately it's currently not possible to build a tree locally and then replicate all the objects.</p>
+
+
+<h4>Methods of a GroupObject</h4>
+
+<p><b>GroupObject.list()</b><br>
+returns an array containing all the properties that are GroupObjects.</p>
+<pre>
+var arr = group.test.list();
+</pre>
+
+<p><b>GroupObject.count() </b><br>
+Returns the number of properties that are GroupObjects. </p>
+
+<p><b>GroupObject.waitFor(propName, x)</b><br>
+Waits for x millis and stops if a property propName is touched in the meantime (added/modified,removed). Can be used for example to wait until a login-server has logged a user in and returned its data to the tree.</p>
+
+<p><b>GroupObject.unwrap(), GroupObject.wrap() </b><br>
+Returns a local copy of a replicated GroupObject, with just the primitive properties (but not the children) copied. This can be used to save network load if more than one property is changed in a row: Unwrap() the object, do all the changes and put it back in the tree by using the wrap() method. It is important to go this way and not just assigning it to the original position because otherwise the branch that existed below that point would get lost.</p>
+<pre>
+var obj = group.test.unwrap();
+obj.key1 = "value1";
+obj.key2 = "value2";
+group.test.wrap(obj);
+</pre>
+
+<p>Please note that transactions are NOT supported, so if the script fails later in the execution changes that were made to replicated objects will remain.</p>
+
+
+<h4>RPC to the whole group</h4>
+
+<p><b>group.getRemote (groupname)</b><br>It is possible to execute requests in all applications that mount to a group. The syntax is similar to Helma's XmlRpc-API. First get a Remote-Object, then call a function on it. The Remote-object represents the root of the remote application, it is possible to descend deeper.</p>
+
+<pre>
+var r = group.getRemote ("sessions");
+var arr = r.testfunction (123,456);
+// or:    r.bogusobj.testfunction() .....
+</pre>
+
+<p>Calling a function returns an array of result objects each having four properties: <code>result</code>, <code>error</code>, <code>host</code> and <code>app</code></p>
+
+<pre>
+for (var i=0; i&lt;arr.length; i++) {
+   res.write (arr[i].app + "@" + arr[i].host + " returned: ");
+   res.writeln ((arr[i].result) ? arr[i].result : arr[i].error);
+}
+</pre>
+<h4>Details of a group / Modifying a group</h4>
+
+<p>For each group some additional information and methods are supplied by the top <code>group</code> object:
+
+<p><b>group.getContent (groupname)<br>
+group.getFullContent (groupname)</b><br>
+the structure of the tree (content) or the full content of the tree (fullContent).</p>
+
+<p><b>group.size (groupname)<br>
+group.count (groupname)</b><br>
+the total number of GroupObjects in the group.</p>
+
+<p><b>group.getMembers (groupname)</b><br>
+a list of all members of the group</p>
+
+<p><b>group.getConnection (groupname)</b><br>
+the ip and portnumber(s) this group is connected to.
+</p>
+
+<p><b>group.getConfig (groupname)</b><br>
+the configuration of this group (the JGroups stack)
+</p>
+
+<p><b>group.getFullConfig (groupname)</b><br>
+the full configuration of this group (the JGroups stack including all properties)
+</p>
+
+<p><b>group.isConnected (groupname)</b><br>
+returns true/false on wether the group is connected.
+</p>
+
+<p><b>group.connect (groupname)<br>
+group.reconnect (groupname)<br>
+group.disconnect (groupname)</b><br>
+Remove or add the server from/to the group, connect() is done at startup automatically.</p>
+
+<p><b>group.reset (groupname)</b><br>
+deletes all content from the group.</p>
+
+<p><b>group.destroy (groupname)</b><br>
+makes all instances of the group disconnect.</p>
+
+<p><b>group.log (message)</b><br>
+logs to the same logfile as the groupextension does. this is useful to have the log statements in the correct order as the internal messages by the extension (which is difficult to achieve if different logs are used).</p>
+
+<p>last modified: 2004-03-28</p>
+
+
